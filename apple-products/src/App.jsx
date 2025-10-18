@@ -1,22 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import Controls from './components/Controls'
 import Navbar from './components/Navbar'
 import Home from './components/Home'
 import Iphone from './components/Iphone'
 import PageTransition from "./components/PageTransition"
+import MacBook from './components/MacBook'
+import IMac from './components/Imac'
+import Watch from './components/Watch'
 
 const App = () => {
-  const[frameZoom, setFrameZoom]= useState(false)
+ const [frameZoom, setFrameZoom] = useState(false)
   const [activePage, setActivePage] = useState(0)
+  const [isLgScreen, setIsLgScreen] = useState(window.innerWidth > 1024)
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLgScreen(window.innerWidth >= 1024)
+      if (window.innerWidth < 1024) {
+        setFrameZoom(true)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleNavClick = (pageIndex) => {
     setActivePage(pageIndex)
   }
 
   const toggleZoom = () => {
-  
+    if (isLgScreen) {
       setFrameZoom(!frameZoom)
-    
+    }
+  }
+
+  const resetPage = () => {
+    setActivePage(0)
+  }
+
+  const toggleNavbar = () => {
+    setIsNavbarOpen(!isNavbarOpen)
   }
 
   return (
@@ -29,15 +53,23 @@ const App = () => {
         <Navbar
           activePage={activePage}
           handleNavClick={handleNavClick}
+          isNavbarOpen={isNavbarOpen}
+          toggleNavbar={toggleNavbar}
           />
-        <Controls toggleZoom={toggleZoom}
-         frameZoom={frameZoom}
+        <Controls 
+          toggleZoom={toggleZoom}
+          frameZoom={frameZoom}
+          resetPage={resetPage}
+          activePage={activePage}
          />
 
           <div className="flex-grow">
             <PageTransition activePage={activePage}>
               <Home onNavigate={handleNavClick}/>
               <Iphone/>
+              <MacBook/>
+              <Watch/>
+              <IMac/>
             </PageTransition>
           </div>
 
